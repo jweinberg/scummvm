@@ -24,11 +24,12 @@
  */
 
 #include "create_project.h"
-#include "codeblocks.h"
 
+#include "codeblocks.h"
 #include "msvc.h"
 #include "visualstudio.h"
 #include "msbuild.h"
+#include "xcode.h"
 
 #include <fstream>
 #include <iostream>
@@ -99,7 +100,8 @@ typedef std::list<FSNode> FileList;
 enum ProjectType {
 	kProjectNone,
 	kProjectCodeBlocks,
-	kProjectMSVC
+	kProjectMSVC,
+	kProjectXcode
 };
 
 int main(int argc, char *argv[]) {
@@ -166,6 +168,14 @@ int main(int argc, char *argv[]) {
 			}
 
 			projectType = kProjectMSVC;
+
+		} else if (!std::strcmp(argv[i], "--xcode")) {
+			if (projectType != kProjectNone) {
+				std::cerr << "ERROR: You cannot pass more than one project type!\n";
+				return -1;
+			}
+
+			projectType = kProjectXcode;
 
 		} else if (!std::strcmp(argv[i], "--msvc-version")) {
 			if (i + 1 >= argc) {
@@ -418,6 +428,18 @@ int main(int argc, char *argv[]) {
 			provider = new CreateProjectTool::MSBuildProvider(globalWarnings, projectWarnings, msvcVersion);
 
 		break;
+
+	case kProjectXcode:
+		////////////////////////////////////////////////////////////////////////////
+		// Xcode is also using GCC behind the scenes. See Code::Blocks comment
+		// for info on all warnings
+		////////////////////////////////////////////////////////////////////////////
+		SET_GLOBAL_WARNINGS("-Wall", "-Wno-long-long", "-Wno-multichar", "-Wno-unknown-pragmas", "-Wno-reorder",
+		                    "-Wpointer-arith", "-Wcast-qual", "-Wcast-align", "-Wshadow", "-Wimplicit",
+		                    "-Wnon-virtual-dtor", "-Wwrite-strings", "-fno-rtti", "-fno-exceptions", "-fcheck-new");
+
+		provider = new CreateProjectTool::XCodeProvider(globalWarnings, projectWarnings);
+		break;
 	}
 
 	provider->createProject(setup);
@@ -456,6 +478,7 @@ void displayHelp(const char *exe) {
 	        "Project specific settings:\n"
 	        " --codeblock              build Code::Blocks project files\n"
 	        " --msvc                   build Visual Studio project files\n"
+	        " --xcode                  build XCode project files\n"
 	        " --file-prefix prefix     allow overwriting of relative file prefix in the\n"
 	        "                          MSVC project files. By default the prefix is the\n"
 	        "                          \"path\\to\\source\" argument\n"

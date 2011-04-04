@@ -27,6 +27,9 @@
     <ClInclude Include="..\visualstudio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\xcode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\codeblocks.cpp">
@@ -42,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\visualstudio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xcode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
