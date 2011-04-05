@@ -6,6 +6,8 @@
 lib*.a
 .deps
 
+.DS_Store
+
 /config.log
 /scummvm
 /scummvm-static
